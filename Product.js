@@ -7,7 +7,15 @@ var Product = /** @class */ (function () {
         this.sku = sku;
         this.name = name;
         this.price = price;
+        this.tags = new Set();
     }
+    Product.prototype.tagsValue = function () {
+        if (this.tags === null || this.tags.size === 0)
+            return "";
+        var tagsValue = [];
+        this.tags.forEach(function (t) { return tagsValue.push("#" + t); });
+        return tagsValue.join(",");
+    };
     return Product;
 }());
 exports.Product = Product;

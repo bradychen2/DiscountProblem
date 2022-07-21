@@ -31,34 +31,35 @@ var products = require("./products.json");
 var decimal_js_1 = require("decimal.js");
 var Product_1 = require("./Product");
 var Discount_1 = require("./Discount");
+var CartContext_1 = require("./CartContext");
+var POS_1 = require("./POS");
 var Program = /** @class */ (function () {
     function Program() {
     }
     Program.prototype.main = function () {
-        var products = this.loadProducts();
-        products.forEach(function (product) {
-            console.log("name: ".concat(product.name, " - price: ").concat(product.price));
+        var _a, _b;
+        var cart = new CartContext_1.CartContext();
+        var pos = new POS_1.POS();
+        (_a = cart.purchasedItems).push.apply(_a, this.loadProducts());
+        (_b = pos.activeRules).push.apply(_b, Array.from(this.loadRules()));
+        pos.checkoutProcess(cart);
+        console.log("購買商品:");
+        console.log("--------------------------------------");
+        cart.purchasedItems.forEach(function (item) {
+            console.log("- ".concat(item.id, ", [").concat(item.sku, "] $").concat(item.price, ", ").concat(item.name, ", ").concat(item.tagsValue()));
         });
-        console.log("Total: ".concat(this.checkoutProcess(products, Array.from(this.loadRules()))));
-    };
-    Program.prototype.checkoutProcess = function (products, rules) {
-        var discounts = [];
-        rules.forEach(function (rule) {
-            discounts = discounts.concat(Array.from(rule.process(products)));
+        console.log("\n");
+        console.log("折扣:");
+        console.log("--------------------------------------");
+        cart.appliedDiscounts.forEach(function (discount) {
+            console.log("- \u6298\u62B5 $".concat(discount.amount, ", ").concat(discount.rule.name, ", (").concat(discount.rule.note, ")"));
+            discount.products.forEach(function (product) {
+                console.log("   * \u7B26\u5408: ".concat(product.id, ", [").concat(product.sku, "], ").concat(product.name, ", ").concat(product.tagsValue()));
+            });
+            console.log("\n");
+            console.log("--------------------------------------");
+            console.log("$\u7D50\u5E33\u91D1\u984D: ".concat(cart.totalPrice));
         });
-        var amountWithoutDiscount = new decimal_js_1.Decimal(0);
-        var totalDiscount = new decimal_js_1.Decimal(0);
-        // original price
-        products.forEach(function (product) {
-            amountWithoutDiscount = amountWithoutDiscount.plus(product.price);
-        });
-        // discount amount
-        discounts.forEach(function (discount) {
-            totalDiscount = totalDiscount.plus(discount.amount);
-            console.log("\u7B26\u5408\u6298\u6263 ".concat(discount.ruleName, ", \u6298\u62B5 ").concat(discount.amount, " \u5143"));
-        });
-        // original price - discount amount
-        return amountWithoutDiscount.minus(totalDiscount);
     };
     Program.prototype.loadProducts = function () {
         var results = [];

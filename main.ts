@@ -2,36 +2,44 @@ const products = require("./products.json");
 import { Decimal } from "decimal.js";
 import { Product } from "./Product";
 import { RuleBase, Discount, BuyMoreBoxesDiscount } from "./Discount";
+import { CartContext } from "./CartContext";
+import { POS } from "./POS";
 
 class Program {
   main(): void {
-    const products: Product[] = this.loadProducts();
-    products.forEach((product) => {
-      console.log(`name: ${product.name} - price: ${product.price}`);
-    });
-    console.log(
-      `Total: ${this.checkoutProcess(products, Array.from(this.loadRules()))}`
-    );
-  }
+    const cart: CartContext = new CartContext();
+    const pos: POS = new POS();
+    cart.purchasedItems.push(...this.loadProducts());
+    pos.activeRules.push(...Array.from(this.loadRules()));
+    pos.checkoutProcess(cart);
 
-  checkoutProcess(products: Product[], rules: RuleBase[]): Decimal {
-    let discounts: Discount[] = [];
-    rules.forEach(function (rule) {
-      discounts = discounts.concat(Array.from(rule.process(products)));
+    console.log("購買商品:");
+    console.log("--------------------------------------");
+    cart.purchasedItems.forEach((item) => {
+      console.log(
+        `- ${item.id}, [${item.sku}] $${item.price}, ${
+          item.name
+        }, ${item.tagsValue()}`
+      );
     });
-    let amountWithoutDiscount: Decimal = new Decimal(0);
-    let totalDiscount: Decimal = new Decimal(0);
-    // original price
-    products.forEach((product) => {
-      amountWithoutDiscount = amountWithoutDiscount.plus(product.price);
+    console.log("\n");
+    console.log("折扣:");
+    console.log("--------------------------------------");
+    cart.appliedDiscounts.forEach((discount) => {
+      console.log(
+        `- 折抵 $${discount.amount}, ${discount.rule.name}, (${discount.rule.note})`
+      );
+      discount.products.forEach((product) => {
+        console.log(
+          `   * 符合: ${product.id}, [${product.sku}], ${
+            product.name
+          }, ${product.tagsValue()}`
+        );
+      });
+      console.log("\n");
+      console.log("--------------------------------------");
+      console.log(`$結帳金額: ${cart.totalPrice}`);
     });
-    // discount amount
-    discounts.forEach((discount) => {
-      totalDiscount = totalDiscount.plus(discount.amount);
-      console.log(`符合折扣 ${discount.ruleName}, 折抵 ${discount.amount} 元`);
-    });
-    // original price - discount amount
-    return amountWithoutDiscount.minus(totalDiscount);
   }
 
   loadProducts(): Product[] {

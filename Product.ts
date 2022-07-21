@@ -5,7 +5,8 @@ export interface Product {
   sku: string;
   name: string;
   price: Decimal;
-  // tags: Map<string, string>;
+  tags: Set<string>;
+  tagsValue(): string;
 }
 
 export class Product implements Product {
@@ -19,5 +20,13 @@ export class Product implements Product {
     this.sku = sku;
     this.name = name;
     this.price = price;
+    this.tags = new Set();
+  }
+
+  tagsValue(): string {
+    if (this.tags === null || this.tags.size === 0) return "";
+    const tagsValue: Array<string> = [];
+    this.tags.forEach((t) => tagsValue.push("#" + t));
+    return tagsValue.join(",");
   }
 }
