@@ -22,14 +22,12 @@ export class Discount {
 }
 
 // 兩箱折扣
-export class BuyMoreBoxesDiscount implements RuleBase {
+export class BuyMoreBoxesDiscount extends RuleBase {
   public readonly boxCount: number = 0;
   public readonly percentOff: number = 0;
-  public id: number;
-  public name: string;
-  public note: string;
 
   constructor(boxes: number, percentOff: number) {
+    super();
     this.boxCount = boxes;
     this.percentOff = percentOff;
     this.name = `${this.boxCount} 箱結帳 ${100 - this.percentOff} 折`;
@@ -52,6 +50,26 @@ export class BuyMoreBoxesDiscount implements RuleBase {
         );
         matchedProducts.splice(0);
       }
+    }
+  }
+}
+
+// 滿 ** 送 **
+export class TotalPriceDiscount extends RuleBase {
+  public readonly minDiscountPrice: Decimal;
+  public readonly discountAmount: Decimal;
+
+  constructor(minPrice: Decimal, discount: Decimal) {
+    super();
+    this.minDiscountPrice = minPrice;
+    this.discountAmount = discount;
+    this.name = `折價滿 ${this.minDiscountPrice} 送 ${this.discountAmount}`;
+    this.note = `每次交易限用一次`;
+  }
+
+  public *process(cart: CartContext): Iterable<Discount> {
+    if (cart.totalPrice.gte(this.minDiscountPrice)) {
+      yield new Discount(this.discountAmount, cart.purchasedItems, this);
     }
   }
 }

@@ -1,7 +1,7 @@
 const products = require("./products.json");
 import { Decimal } from "decimal.js";
 import { Product } from "./Product";
-import { RuleBase, BuyMoreBoxesDiscount } from "./Discount";
+import { RuleBase, BuyMoreBoxesDiscount, TotalPriceDiscount } from "./Discount";
 import { CartContext } from "./CartContext";
 import { POS } from "./POS";
 
@@ -47,7 +47,13 @@ class Program {
     const id = Math.floor(Date.now() / 1000);
     products.forEach((product) => {
       results.push(
-        new Product(id, product.sku, product.name, new Decimal(product.price))
+        new Product(
+          id,
+          product.sku,
+          product.name,
+          new Decimal(product.price),
+          product.tags
+        )
       );
     });
     return results;
@@ -55,7 +61,7 @@ class Program {
 
   *loadRules(): Iterable<RuleBase> {
     yield new BuyMoreBoxesDiscount(2, 12);
-    // yield new TotalPriceDiscount(new Decimal(1000), new Decimal(100));
+    yield new TotalPriceDiscount(new Decimal(1000), new Decimal(100));
   }
 }
 

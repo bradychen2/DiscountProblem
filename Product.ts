@@ -15,12 +15,18 @@ export class Product implements Product {
   public name: string;
   public price: Decimal;
 
-  constructor(id: number, sku: string, name: string, price: Decimal) {
+  constructor(
+    id: number,
+    sku: string,
+    name: string,
+    price: Decimal,
+    tags: Array<string>
+  ) {
     this.id = id;
     this.sku = sku;
     this.name = name;
     this.price = price;
-    this.tags = new Set();
+    this.tags = new Set(tags);
   }
 
   tagsValue(): string {

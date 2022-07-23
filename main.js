@@ -65,7 +65,7 @@ var Program = /** @class */ (function () {
         var results = [];
         var id = Math.floor(Date.now() / 1000);
         products.forEach(function (product) {
-            results.push(new Product_1.Product(id, product.sku, product.name, new decimal_js_1.Decimal(product.price)));
+            results.push(new Product_1.Product(id, product.sku, product.name, new decimal_js_1.Decimal(product.price), product.tags));
         });
         return results;
     };
@@ -74,6 +74,9 @@ var Program = /** @class */ (function () {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, new Discount_1.BuyMoreBoxesDiscount(2, 12)];
                 case 1:
+                    _a.sent();
+                    return [4 /*yield*/, new Discount_1.TotalPriceDiscount(new decimal_js_1.Decimal(1000), new decimal_js_1.Decimal(100))];
+                case 2:
                     _a.sent();
                     return [2 /*return*/];
             }

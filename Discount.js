@@ -1,4 +1,19 @@
 "use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var __generator = (this && this.__generator) || function (thisArg, body) {
     var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
     return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
@@ -36,7 +51,7 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
     return to.concat(ar || Array.prototype.slice.call(from));
 };
 exports.__esModule = true;
-exports.BuyMoreBoxesDiscount = exports.Discount = exports.RuleBase = void 0;
+exports.TotalPriceDiscount = exports.BuyMoreBoxesDiscount = exports.Discount = exports.RuleBase = void 0;
 var decimal_js_1 = require("decimal.js");
 var RuleBase = /** @class */ (function () {
     function RuleBase() {
@@ -54,14 +69,17 @@ var Discount = /** @class */ (function () {
 }());
 exports.Discount = Discount;
 // 兩箱折扣
-var BuyMoreBoxesDiscount = /** @class */ (function () {
+var BuyMoreBoxesDiscount = /** @class */ (function (_super) {
+    __extends(BuyMoreBoxesDiscount, _super);
     function BuyMoreBoxesDiscount(boxes, percentOff) {
-        this.boxCount = 0;
-        this.percentOff = 0;
-        this.boxCount = boxes;
-        this.percentOff = percentOff;
-        this.name = "".concat(this.boxCount, " \u7BB1\u7D50\u5E33 ").concat(100 - this.percentOff, " \u6298");
-        this.note = "\u71B1\u92B7\u98F2\u54C1 \u9650\u6642\u512A\u60E0";
+        var _this = _super.call(this) || this;
+        _this.boxCount = 0;
+        _this.percentOff = 0;
+        _this.boxCount = boxes;
+        _this.percentOff = percentOff;
+        _this.name = "".concat(_this.boxCount, " \u7BB1\u7D50\u5E33 ").concat(100 - _this.percentOff, " \u6298");
+        _this.note = "\u71B1\u92B7\u98F2\u54C1 \u9650\u6642\u512A\u60E0";
+        return _this;
     }
     // 折扣規則的實作
     BuyMoreBoxesDiscount.prototype.process = function (cart) {
@@ -108,5 +126,32 @@ var BuyMoreBoxesDiscount = /** @class */ (function () {
         });
     };
     return BuyMoreBoxesDiscount;
-}());
+}(RuleBase));
 exports.BuyMoreBoxesDiscount = BuyMoreBoxesDiscount;
+// 滿 ** 送 **
+var TotalPriceDiscount = /** @class */ (function (_super) {
+    __extends(TotalPriceDiscount, _super);
+    function TotalPriceDiscount(minPrice, discount) {
+        var _this = _super.call(this) || this;
+        _this.minDiscountPrice = minPrice;
+        _this.discountAmount = discount;
+        _this.name = "\u6298\u50F9\u6EFF ".concat(_this.minDiscountPrice, " \u9001 ").concat(_this.discountAmount);
+        _this.note = "\u6BCF\u6B21\u4EA4\u6613\u9650\u7528\u4E00\u6B21";
+        return _this;
+    }
+    TotalPriceDiscount.prototype.process = function (cart) {
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    if (!cart.totalPrice.gte(this.minDiscountPrice)) return [3 /*break*/, 2];
+                    return [4 /*yield*/, new Discount(this.discountAmount, cart.purchasedItems, this)];
+                case 1:
+                    _a.sent();
+                    _a.label = 2;
+                case 2: return [2 /*return*/];
+            }
+        });
+    };
+    return TotalPriceDiscount;
+}(RuleBase));
+exports.TotalPriceDiscount = TotalPriceDiscount;
