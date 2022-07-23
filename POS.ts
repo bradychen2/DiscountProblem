@@ -15,15 +15,14 @@ export class POS {
     this.activeRules.forEach((rule) => {
       const discounts = rule.process(cart);
       cart.appliedDiscounts.push(...Array.from(discounts));
-
-      // total discount amount
-      let totalDiscount: Decimal = new Decimal(0);
-      cart.appliedDiscounts.forEach((discount) => {
-        totalDiscount = totalDiscount.plus(discount.amount);
-      });
-      // original total price - total discount amount
-      cart.totalPrice = cart.totalPrice.minus(totalDiscount);
     });
+    // total discount amount
+    let totalDiscount: Decimal = new Decimal(0);
+    cart.appliedDiscounts.forEach((discount) => {
+      totalDiscount = totalDiscount.plus(discount.amount);
+    });
+    // original total price - total discount amount
+    cart.totalPrice = cart.totalPrice.minus(totalDiscount);
     return true;
   }
 }

@@ -57,9 +57,9 @@ var Program = /** @class */ (function () {
                 console.log("   * \u7B26\u5408: ".concat(product.id, ", [").concat(product.sku, "], ").concat(product.name, ", ").concat(product.tagsValue()));
             });
             console.log("\n");
-            console.log("--------------------------------------");
-            console.log("$\u7D50\u5E33\u91D1\u984D: ".concat(cart.totalPrice));
         });
+        console.log("--------------------------------------");
+        console.log("$\u7D50\u5E33\u91D1\u984D: ".concat(cart.totalPrice));
     };
     Program.prototype.loadProducts = function () {
         var results = [];

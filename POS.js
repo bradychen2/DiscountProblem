@@ -17,14 +17,14 @@ var POS = /** @class */ (function () {
             var _a;
             var discounts = rule.process(cart);
             (_a = cart.appliedDiscounts).push.apply(_a, Array.from(discounts));
-            // total discount amount
-            var totalDiscount = new decimal_js_1["default"](0);
-            cart.appliedDiscounts.forEach(function (discount) {
-                totalDiscount = totalDiscount.plus(discount.amount);
-            });
-            // original total price - total discount amount
-            cart.totalPrice = cart.totalPrice.minus(totalDiscount);
         });
+        // total discount amount
+        var totalDiscount = new decimal_js_1["default"](0);
+        cart.appliedDiscounts.forEach(function (discount) {
+            totalDiscount = totalDiscount.plus(discount.amount);
+        });
+        // original total price - total discount amount
+        cart.totalPrice = cart.totalPrice.minus(totalDiscount);
         return true;
     };
     return POS;

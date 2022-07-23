@@ -1,7 +1,7 @@
 const products = require("./products.json");
 import { Decimal } from "decimal.js";
 import { Product } from "./Product";
-import { RuleBase, Discount, BuyMoreBoxesDiscount } from "./Discount";
+import { RuleBase, BuyMoreBoxesDiscount } from "./Discount";
 import { CartContext } from "./CartContext";
 import { POS } from "./POS";
 
@@ -37,9 +37,9 @@ class Program {
         );
       });
       console.log("\n");
-      console.log("--------------------------------------");
-      console.log(`$結帳金額: ${cart.totalPrice}`);
     });
+    console.log("--------------------------------------");
+    console.log(`$結帳金額: ${cart.totalPrice}`);
   }
 
   loadProducts(): Product[] {
@@ -55,6 +55,7 @@ class Program {
 
   *loadRules(): Iterable<RuleBase> {
     yield new BuyMoreBoxesDiscount(2, 12);
+    // yield new TotalPriceDiscount(new Decimal(1000), new Decimal(100));
   }
 }
 
