@@ -1,8 +1,9 @@
 {
   "compilerOptions": {
-    "lib": ["es2016", "dom"],
-    "target": "es5",
+    "lib": ["es2016", "dom", "es2015.collection", "es2015.iterable"],
+    "target": "es2016",
     "module": "commonjs",
-    "sourceMap": true
+    "sourceMap": true,
+    "downlevelIteration": true
   }
 }

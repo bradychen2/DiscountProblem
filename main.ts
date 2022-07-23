@@ -1,7 +1,13 @@
-const products = require("./products.json");
+const products = require("./testCases/TheSameProducts.json");
 import { Decimal } from "decimal.js";
 import { Product } from "./Product";
-import { RuleBase, BuyMoreBoxesDiscount, TotalPriceDiscount } from "./Discount";
+import {
+  RuleBase,
+  BuyMoreBoxesDiscount,
+  TotalPriceDiscount,
+  SelectedItemsGetXDiscountY,
+  theSameItemsGetNthPriceY,
+} from "./Discount";
 import { CartContext } from "./CartContext";
 import { POS } from "./POS";
 
@@ -60,8 +66,10 @@ class Program {
   }
 
   *loadRules(): Iterable<RuleBase> {
-    yield new BuyMoreBoxesDiscount(2, 12);
-    yield new TotalPriceDiscount(new Decimal(1000), new Decimal(100));
+    yield new BuyMoreBoxesDiscount(["熱銷飲品"], 2, 12);
+    // yield new TotalPriceDiscount(new Decimal(1000), new Decimal(100));
+    yield new SelectedItemsGetXDiscountY(["衛生紙"], 6, new Decimal(100));
+    yield new theSameItemsGetNthPriceY(["同商品加購優惠"], 2, new Decimal(10));
   }
 }
 
