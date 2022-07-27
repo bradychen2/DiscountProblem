@@ -269,3 +269,115 @@ export class theSameItemsGetNthPriceY extends RuleBase {
     }
   }
 }
+
+export class selectedItemsMatch extends RuleBase {
+  public readonly drinksTags: Set<string>;
+  public readonly foodsTags: Set<string>;
+  public readonly matchingRules: Array<Array<number | Array<number>>>;
+  constructor(
+    drinksTags: Array<string>,
+    foodsTags: Array<string>,
+    // example of rules: [[59, [59, 49]], [49, [59, 49]] ,[39, [39]]]
+    matchingRules: Array<Array<number | Array<number>>>
+  ) {
+    super();
+    this.matchingRules = matchingRules.sort((a: number[], b: number[]) => {
+      return b[0] - a[0];
+    });
+    this.drinksTags = new Set(
+      drinksTags.sort((a, b) => {
+        const tagA = a.toUpperCase();
+        const tagB = b.toUpperCase();
+        if (tagA > tagB) {
+          return -1;
+        }
+        if (tagA < tagB) {
+          return 1;
+        }
+      })
+    );
+    this.foodsTags = new Set(
+      foodsTags.sort((a, b) => {
+        const tagA = a.toUpperCase();
+        const tagB = b.toUpperCase();
+        if (tagA > tagB) {
+          return -1;
+        }
+        if (tagA < tagB) {
+          return 1;
+        }
+      })
+    );
+    this.name = `配對折扣`;
+    this.note = `飲料鮮食超值配 39/49/59`;
+  }
+
+  private buildTaggedMap(
+    taggedMap: Map<string, Product[]>,
+    tagsSet: Set<string>,
+    tag: string,
+    item: Product
+  ): void {
+    if (tagsSet.has(tag)) {
+      for (let rule of this.matchingRules) {
+        const price: string = String(rule[0]);
+        if (tag.includes(price)) {
+          if (!taggedMap.has(price)) taggedMap.set(price, [item]);
+          else taggedMap.get(price).push(item);
+          break;
+        }
+      }
+    }
+  }
+
+  private findMatchFood(
+    foodsMap: Map<string, Product[]>,
+    matchPrice: number[]
+  ): Product {
+    let food: Product;
+    for (let price of matchPrice) {
+      if (
+        foodsMap.get(String(price)) !== undefined &&
+        foodsMap.get(String(price)).length !== 0
+      ) {
+        food = foodsMap.get(String(price)).shift();
+        return food;
+      }
+    }
+    return undefined;
+  }
+
+  public *process(cart: CartContext): Iterable<Discount> {
+    const taggedDrink: Map<string, Product[]> = new Map();
+    const taggedFoods: Map<string, Product[]> = new Map();
+    cart.purchasedItems.sort((a, b) => Number(b.price.minus(a.price)));
+    for (let item of cart.purchasedItems) {
+      for (let tag of item.tags) {
+        this.buildTaggedMap(taggedDrink, this.drinksTags, tag, item);
+        this.buildTaggedMap(taggedFoods, this.foodsTags, tag, item);
+      }
+    }
+    // search from the highest price
+    for (let rule of this.matchingRules) {
+      const price = String(rule[0]);
+      const matchPrice: any = rule[1];
+      if (
+        taggedDrink.get(price) === undefined ||
+        taggedDrink.get(price).length === 0
+      ) {
+        continue;
+      }
+      for (let drink of taggedDrink.get(price)) {
+        let food: Product = this.findMatchFood(taggedFoods, matchPrice);
+        let salePrice: Decimal = new Decimal(Number(price));
+        if (food !== undefined && salePrice !== undefined) {
+          yield new Discount(
+            drink.price.plus(food.price).minus(salePrice),
+            [drink, food],
+            this
+          );
+        }
+      }
+    }
+  }
+}

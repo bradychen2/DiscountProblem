@@ -1,4 +1,4 @@
-const products = require("./testCases/TheSameProducts.json");
+const products = require("./testCases/SelectedMatch.json");
 import { Decimal } from "decimal.js";
 import { Product } from "./Product";
 import {
@@ -7,6 +7,7 @@ import {
   TotalPriceDiscount,
   SelectedItemsGetXDiscountY,
   theSameItemsGetNthPriceY,
+  selectedItemsMatch,
 } from "./Discount";
 import { CartContext } from "./CartContext";
 import { POS } from "./POS";
@@ -66,10 +67,19 @@ class Program {
   }
 
   *loadRules(): Iterable<RuleBase> {
-    yield new BuyMoreBoxesDiscount(["熱銷飲品"], 2, 12);
+    // yield new BuyMoreBoxesDiscount(["熱銷飲品"], 2, 12);
     // yield new TotalPriceDiscount(new Decimal(1000), new Decimal(100));
-    yield new SelectedItemsGetXDiscountY(["衛生紙"], 6, new Decimal(100));
-    yield new theSameItemsGetNthPriceY(["同商品加購優惠"], 2, new Decimal(10));
+    // yield new SelectedItemsGetXDiscountY(["衛生紙"], 6, new Decimal(100));
+    // yield new theSameItemsGetNthPriceY(["同商品加購優惠"], 2, new Decimal(10));
+    yield new selectedItemsMatch(
+      ["超值配飲料39", "超值配飲料49", "超值配飲料59"],
+      ["超值配鮮食39", "超值配鮮食49", "超值配鮮食59"],
+      [
+        [59, [59, 49]],
+        [49, [59, 49]],
+        [39, [39]],
+      ]
+    );
   }
 }
 
