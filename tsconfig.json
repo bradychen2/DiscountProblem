@@ -3,6 +3,7 @@
     "lib": ["es2016", "dom"],
     "target": "es5",
     "module": "commonjs",
-    "sourceMap": true
+    "sourceMap": true,
+    "outDir": "./build"
   }
 }
